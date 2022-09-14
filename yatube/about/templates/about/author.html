@@ -1,0 +1,22 @@
+<!-- templates/about/author.html -->
+{% extends "base.html" %}
+
+{% load static %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block content %}
+<div class="container py-3 my-3 ">
+  <h1 class="text-center">Привет, я Маркидонов Василий</h1>
+   <img src={% static 'img/voshod4.png' %} width="1115" height="370" class="d-inline-block align-top rounded-pill" alt="">
+   <ul class="list-group">
+    <li class="list-group-item disabled">Возраст: 32 года</li>
+    <li class="list-group-item disabled">Семейное положение: женат, двое детей</li>
+    <li class="list-group-item disabled">Род деятельности: тренер по рукопашному бою</li>
+    <a href="https://github.com/markidonov"
+       class="list-group-item list-group-item-action"> Моя страница GitHub</a>
+    <a href="https://vk.com/prostoadresssssss"
+       class="list-group-item list-group-item-action"> Моя страница VK</a>
+       <a href="https://fairy-writer.ru/"
+       class="list-group-item list-group-item-action"> Мой первый сайт (до обучения в Yandex-Practicum)</a>   
+   </ul>
+</div>  
+{% endblock %}
