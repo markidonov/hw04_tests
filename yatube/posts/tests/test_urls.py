@@ -34,10 +34,10 @@ class TaskURLTests(TestCase):
         отдельно взятого поста - доступны всем.
         """
         url_names = (
-                     '/',
-                     '/group/test_slug/',
-                     '/profile/test_name1/',
-                     f'/posts/{self.post.id}/',
+            '/',
+            '/group/test_slug/',
+            '/profile/test_name1/',
+            f'/posts/{self.post.id}/',
         )
         for address in url_names:
             with self.subTest():

@@ -162,7 +162,8 @@ class PaginatorViewsTest(TestCase):
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_index_second_page_contains_three_records(self):
-        response = self.authorized_client.get(reverse('posts:index')+'?page=2')
+        response = self.authorized_client.get(
+            reverse('posts:index') + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_group_list_first_page_contains_ten_records(self):
@@ -174,7 +175,8 @@ class PaginatorViewsTest(TestCase):
     def test_group_list_second_page_contains_three_records(self):
         response = self.authorized_client.get(
             reverse('posts:group_list',
-                    kwargs={'slug': PaginatorViewsTest.group.slug})+'?page=2')
+                    kwargs={'slug':
+                            PaginatorViewsTest.group.slug}) + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_profail_first_page_contains_ten_records(self):
