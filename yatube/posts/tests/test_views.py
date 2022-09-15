@@ -36,11 +36,8 @@ class PostPagesTests(TestCase):
             text='Третья тестовая запись для создания нового поста',)
 
     def setUp(self):
-        # Создаем неавторизованный клиент
         self.client = User.objects.create_user(username='Noname',)
-        # Создаем второй клиент
         self.authorized_client = Client()
-        # Авторизуем пользователя
         self.authorized_client.force_login(self.user)
 
     def test_pages_uses_correct_template(self):
@@ -150,43 +147,49 @@ class PaginatorViewsTest(TestCase):
                 group=cls.group,)
 
     def setUp(self):
-        # Создаем неавторизованный клиент
         self.unathorized_client = Client()
-        # Создаем второй клиент
         self.authorized_client = Client()
-        # Авторизуем пользователя
         self.authorized_client.force_login(self.user)
+
+    FIRST_PAGE = 10
+    SECOND_PAGE = 3
 
     def test_index_first_page_contains_ten_records(self):
         response = self.unathorized_client.get(reverse('posts:index'))
-        self.assertEqual(len(response.context['page_obj']), 10)
+        self.assertEqual(len(response.context['page_obj']),
+                         PaginatorViewsTest.FIRST_PAGE)
 
     def test_index_second_page_contains_three_records(self):
         response = self.authorized_client.get(
             reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 3)
+        self.assertEqual(len(response.context['page_obj']),
+                         PaginatorViewsTest.SECOND_PAGE)
 
     def test_group_list_first_page_contains_ten_records(self):
         response = self.unathorized_client.get(
             reverse('posts:group_list',
                     kwargs={'slug': PaginatorViewsTest.group.slug}))
-        self.assertEqual(len(response.context['page_obj']), 10)
+        self.assertEqual(len(response.context['page_obj']),
+                         PaginatorViewsTest.FIRST_PAGE)
 
     def test_group_list_second_page_contains_three_records(self):
         response = self.authorized_client.get(
             reverse('posts:group_list',
                     kwargs={'slug':
                             PaginatorViewsTest.group.slug}) + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 3)
+        self.assertEqual(len(response.context['page_obj']),
+                         PaginatorViewsTest.SECOND_PAGE)
 
     def test_profail_first_page_contains_ten_records(self):
         response = self.unathorized_client.get(
             reverse('posts:profile',
                     args={PaginatorViewsTest.user.username}))
-        self.assertEqual(len(response.context['page_obj']), 10)
+        self.assertEqual(len(response.context['page_obj']),
+                         PaginatorViewsTest.FIRST_PAGE)
 
     def test_profail_second_page_contains_three_records(self):
         response = self.authorized_client.get(
             reverse('posts:profile',
                     args={PaginatorViewsTest.user.username}) + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 3)
+        self.assertEqual(len(response.context['page_obj']),
+                         PaginatorViewsTest.SECOND_PAGE)

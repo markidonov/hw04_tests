@@ -1,7 +1,7 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 from posts.models import Group, Post, User
-import time
+from http import HTTPStatus
 
 
 class PostPagesTests(TestCase):
@@ -13,7 +13,6 @@ class PostPagesTests(TestCase):
             title=('Заголовок для тестовой группы'),
             slug='test_slug',
             description="Тестовое описание",)
-        time.sleep(0.01)
         cls.group2 = Group.objects.create(
             title=('Заголовок для тестовой группы 2'),
             slug='test_slug2',
@@ -24,8 +23,27 @@ class PostPagesTests(TestCase):
             group=cls.group,)
 
     def setUp(self):
+        self.unauthorized_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+
+    def test_redirect_anonymous_on_login(self):
+        """Неавторизованный клиент не может создать пост
+        и будет перенаправлен на страницу авторизации.
+        """
+        posts_count = Post.objects.count()
+        form_data = {
+            'text': 'Теcт добавления поста',
+            'group': self.group.id
+        }
+        response = self.unauthorized_client.post(
+            reverse('posts:post_create'),
+            data=form_data,
+            follow=True
+        )
+        self.assertEqual(Post.objects.count(), posts_count)
+        self.assertRedirects(response, '/auth/login/?next=/create/')
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_create_form(self):
         """Проверка создания записи в БД."""
@@ -41,6 +59,7 @@ class PostPagesTests(TestCase):
         )
         post_latest = Post.objects.latest('id')
         self.assertEqual(Post.objects.count(), posts_count + 1)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertRedirects(response, reverse(
             'posts:profile', kwargs={'username': self.post.author}))
         self.assertEqual(post_latest.text, form_data['text'])
@@ -64,6 +83,7 @@ class PostPagesTests(TestCase):
         post_latest = Post.objects.latest('id')
         self.assertEqual(Post.objects.filter(
             group=PostPagesTests.group).count(), posts_group_count - 1)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertRedirects(response, reverse(
             'posts:post_detail', kwargs={'post_id': PostPagesTests.post.id}))
         self.assertEqual(post_latest.text, form_data['text'])

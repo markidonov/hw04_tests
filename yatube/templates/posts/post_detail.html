@@ -16,10 +16,10 @@
             </li>
             {% endif %}
             <li class="list-group-item">
-              Автор: <b>{{author.get_full_name}} </b>
+              Автор: <b>{{post.author.get_full_name}} </b>
             </li>
             <li class="list-group-item ">
-              Всего постов автора: <span class="text-success bg-light">{{ posts_count }}</span>
+              Всего постов автора: <span class="text-success bg-light">{{ post.author.posts.count }}</span>
             </li>
             <li class="list-group-item">
               <a href="{% url 'posts:profile' post.author %}">
@@ -32,7 +32,7 @@
           <p>
             {{post.text}}
           </p>
-          {% if user.id == author.id %}
+          {% if user.id == post.author.id %}
           <a class="btn btn-primary" href="{% url 'posts:post_edit' post.id %}">
             редактировать запись
           </a>

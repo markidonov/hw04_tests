@@ -52,46 +52,6 @@
               </div>
             </div>
           {% endfor %}
-        <!--      <div class="form-group row my-3 p-3">
-                <label for="id_text">
-                Текст поста                                                
-                  <span class="required text-danger" >*</span>                  
-                </label>
-                
-                <textarea name="text" cols="40" rows="10" class="form-control" required id="post_id" 
-                >{% if is_edit %}{{post.text}}{% endif %} </textarea>                
-                 
-                <small id="id_text-help" class="form-text text-muted">
-                  {% if is_edit %}
-                    Редактировать 
-                  {% else %}
-                    {%for field in form %}  
-                      {% if field.help_text %}{{ field.help_text}} {% endif %}
-                    {% endfor %} 
-                  {% endif %} 
-                  
-                </small>
-              </div>            
-              <div class="form-group row my-3 p-3">
-                <label for="id_group">
-                  Группа                  
-                </label>
-                <select name="group" class="form-control" id="group_id">
-                  <option value="" selected>
-                    {% if is_edit %}
-                      Выберите группу (пост был в группе "{{post.group}}")
-                    {% else %}
-                      Выберите группу
-                    {% endif %}
-                  </option>
-                    {% for title in group %}
-                    <option value="{{ title.id }}">{{ title }}</option>
-                    {% endfor %}
-                </select>
-                <small id="id_group-help" class="form-text text-muted">
-                  Группа, к которой будет относиться пост
-                </small>
-              </div>-->
               <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">
                   {% if is_edit %}

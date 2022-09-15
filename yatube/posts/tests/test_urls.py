@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
-
+from http import HTTPStatus
 from posts.models import Group, Post
 
 User = get_user_model()
@@ -14,62 +14,67 @@ class TaskURLTests(TestCase):
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовая запись для создания нового поста',)
-
         cls.group = Group.objects.create(
             title=('Заголовок для тестовой группы'),
             slug='test_slug',
             description="Тестовое описание",
         )
+        cls.index_url = '/'
+        cls.group_url = '/group/test_slug/'
+        cls.profail_url = '/profile/test_name1/'
+        cls.post_detail_url = f'/posts/{cls.post.id}/'
+        cls.create_url = '/create/'
+        cls.edit_url = f'/posts/{cls.post.id}/edit/'
 
     def setUp(self):
-        # Создаем неавторизованный клиент
         self.guest_client = Client()
-# Создаем второй клиент
         self.authorized_client = Client()
-        # Авторизуем пользователя
         self.authorized_client.force_login(self.user)
 
     def test_index_group_profail(self):
         """Cтраницы: главная, группы, профиля,
         отдельно взятого поста - доступны всем.
         """
+        task = TaskURLTests
         url_names = (
-            '/',
-            '/group/test_slug/',
-            '/profile/test_name1/',
-            f'/posts/{self.post.id}/',
+            task.index_url,
+            task.group_url,
+            task.profail_url,
+            task.post_detail_url,
         )
         for address in url_names:
             with self.subTest():
                 response = self.guest_client.get(address)
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_create_for_authorized(self):
         """Страница /create доступна авторизованному пользователю."""
-        response = self.authorized_client.get('/create/')
-        self.assertEqual(response.status_code, 200)
+        response = self.authorized_client.get(TaskURLTests.create_url)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_anonymous_on_login(self):
         """Страница /create/ перенаправит анонимного пользователя
         на страницу логина.
         """
-        response = self.guest_client.get('/create/', follow=True)
+        response = self.guest_client.get(TaskURLTests.create_url, follow=True)
         self.assertRedirects(response, '/auth/login/?next=/create/')
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_edit_for_author(self):
         """Страница 'posts/<int:post_id>/edit/' доступна автору."""
-        response = self.authorized_client.get(f'/posts/{self.post.id}/edit/')
-        self.assertEqual(response.status_code, 200)
+        response = self.authorized_client.get(TaskURLTests.edit_url)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
+        task = TaskURLTests
         templates_url_names = {
-            '/': 'posts/index.html',
-            '/group/test_slug/': 'posts/group_list.html',
-            '/profile/test_name1/': 'posts/profile.html',
-            '/create/': 'posts/post_create.html',
-            f'/posts/{self.post.id}/': 'posts/post_detail.html',
-            f'/posts/{self.post.id}/edit/': 'posts/post_create.html',
+            task.index_url: 'posts/index.html',
+            task.group_url: 'posts/group_list.html',
+            task.profail_url: 'posts/profile.html',
+            task.create_url: 'posts/post_create.html',
+            task.post_detail_url: 'posts/post_detail.html',
+            task.edit_url: 'posts/post_create.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(url=address):
@@ -77,16 +82,5 @@ class TaskURLTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_page_404(self):
-        response = self.guest_client.get('/j7ytkuk6ybkjb87ku/')
-        self.assertEqual(response.status_code, 404)
-
-    # def test_private_url(self):
-        #     """без авторизации приватные URL недоступны"""
-        #     url_names = (
-        #         '/create/',
-        #         '/admin/',
-        #     )
-        #     for address in url_names:
-        #         with self.subTest():
-        #             response = self.guest_client.get(address)
-        #             self.assertEqual(response.status_code, 302)
+        response = self.guest_client.get('/any_wrong_address/')
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
